@@ -39,18 +39,18 @@ public class PracticaServicesImpl implements PracticaServices{
 				// Paso 5. Persistir la practica
 				//
 		
-		List<Sala> salasCreada = crearTodasSalas(practica.gettSala(), practica.getMiembros());		
+		List<Sala> salasCreada = asignarSalasPractica(practica.gettSala(), practica.getMiembros());		
 		
 		salaRepository.saveAll(salasCreada);
 		
 		practica.setSalas(salasCreada);
+		
 		practica.setFechaHora(new Date());
 		
-		Practica practicaCreada = practicaRepository.save(practica);		
+		Practica practicaFinalizada = practicaRepository.save(practica);		
 		
-
 		
-		return practicaCreada;
+		return practicaFinalizada;
 		
 	}
 
@@ -83,7 +83,7 @@ public class PracticaServicesImpl implements PracticaServices{
 		
 	}
 	
-	private List<Sala> crearTodasSalas(int tsala, int miembrosTotal){
+	private List<Sala> asignarSalasPractica(int tsala, int miembrosTotal){
 		
 		int numeroSalas = miembrosTotal / tsala;
 		
@@ -99,21 +99,19 @@ public class PracticaServicesImpl implements PracticaServices{
 		
 		for (int i = 0; i < numeroSalas; i++) {
 			Sala sala = new Sala();
-			String nombreSala = ("0" + i);
-			nombreSala = nombreSala.substring(nombreSala.length() -2);
-			sala.setNombre("Sala_" + nombreSala);
-			int desde = i * tsala;
-			int hasta = desde + tsala;
-			List<Integer> salaMiembros = new ArrayList<>(listaMiembros.subList(desde, hasta));
+			
+			int inicio = i * tsala;
+			int fin = inicio + tsala;
+			List<Integer> salaMiembros = new ArrayList<>(listaMiembros.subList(inicio, fin));
 			sala.setMiembros(salaMiembros);
 			salas.add(sala);
 		}
 		
-		int j = 0;
+		int contador = 0;
 		
 		for (int i = (numeroSalas * tsala); i < listaMiembros.size(); i++) {
-			salas.get(j).getMiembros().add(listaMiembros.get(i));
-			j++;
+			salas.get(contador).getMiembros().add(listaMiembros.get(i));
+			contador++;
 		}
 		
 		return salas;
